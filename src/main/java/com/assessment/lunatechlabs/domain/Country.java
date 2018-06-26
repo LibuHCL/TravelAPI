@@ -48,7 +48,6 @@ public class Country {
 	private String keywords;
 
 	@Singular
-	// @OneToMany(cascade = ALL, mappedBy = "country")
 	@Transient
 	private List<Airport> airports;
 

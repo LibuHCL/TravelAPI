@@ -53,14 +53,14 @@ public class TravelApiApplication {
 	void saveAirports() throws IOException {
 		CsvUtils.readCsv("airports.csv").parallelStream().forEach(row -> {
 			Airport airport = Airport.from(row,
-					(country) -> countryRepository.findByLowerCaseCode(country.toLowerCase()).getId());
+					country -> countryRepository.findByLowerCaseCode(country.toLowerCase()).getId());
 			airportRepository.save(airport);
 		});
 	}
 
 	void saveRunways() throws IOException {
 		CsvUtils.readCsv("runways.csv").parallelStream().forEach(row -> {
-			Runway runway = Runway.from(row, (airportId) -> airportRepository.findOne(airportId).getCountryId());
+			Runway runway = Runway.from(row, airportId -> airportRepository.findOne(airportId).getCountryId());
 
 			runwayRepository.save(runway);
 		});

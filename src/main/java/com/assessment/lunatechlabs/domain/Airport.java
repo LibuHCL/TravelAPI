@@ -64,7 +64,7 @@ public class Airport implements Serializable {
 	private Long countryId;
 
 	@Transient
-	private Country country;
+	private transient Country country;
 
 	@Singular
 	@Transient
