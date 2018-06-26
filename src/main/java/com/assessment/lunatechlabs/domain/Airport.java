@@ -4,85 +4,81 @@
 package com.assessment.lunatechlabs.domain;
 
 import java.io.Serializable;
-import java.util.Set;
+
+import lombok.*;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
+import javax.persistence.Transient;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import static com.assessment.lunatechlabs.utilities.CsvUtils.l;
+import static com.assessment.lunatechlabs.utilities.CsvUtils.s;
+import com.assessment.lunatechlabs.domain.Country;
 
 /**
  * @author Libu
  *
  */
 @Entity
-@Table(name="airport")
 @Data
-@AllArgsConstructor
+@Builder
 @NoArgsConstructor
+@AllArgsConstructor
+@EqualsAndHashCode(of = { "countryId", "id", "name" })
+@ToString(exclude = { "country", "runways" })
 public class Airport implements Serializable {
-	
-	private static final long serialVersionUID = -4087970586697604466L;
-	
+
+	private static final long serialVersionUID = -3832055835941264254L;
+
 	@Id
-	@Column(name="id")
-	private String id;
-	
-	private String isoCountrys;
-	
-	@Column(name="ident")
+	@Column(name = "airportId")
+	private long id;
+
+	@NonNull
 	private String ident;
-	
-	@Column(name="type")
-	private String type;
-	
-	@Column(name="name")
+
+	@NonNull
 	private String name;
-	
-	@Column(name="elevationFt")
+
+	private String type;
+	private String latitudeDeg;
+	private String longitudeDeg;
 	private String elevationFt;
-	
-	@Column(name="continent")
 	private String continent;
-	
-	@Column(name="ISORegion")
-	private String ISORegion;
-	
-	@Column(name="muncipality")
-	private String muncipality;
-	
-	@Column(name="scheduledService")
+	private String isoCountry;
+	private String isoRegion;
+	private String municipality;
 	private String scheduledService;
-	
-	@Column(name="gpsCode")
 	private String gpsCode;
-	
-	@Column(name="iataCode")
 	private String iataCode;
-	
-	@Column(name="localCode")
 	private String localCode;
-	
-	@Column(name="homeLink")
 	private String homeLink;
-	
-	@Column(name="wikipediaLink")
 	private String wikipediaLink;
-	
-	@Column(name="keywords")
 	private String keywords;
-	
-	@ManyToOne
-	@JoinColumn(name="ISOCountry")
-	private Countries countries;
-	
-	@OneToMany(mappedBy="airport")
-	private Set<Runways> runway;
+
+	@NonNull
+	private Long countryId;
+
+	@Transient
+	private Country country;
+
+	@Singular
+	@Transient
+	private List<Runway> runways;
+
+	public static Airport from(Map<String, String> values, Function<String, Long> countryProvider) {
+		return builder().id(l(values, "id")).ident(s(values, "ident")).type(s(values, "type")).name(s(values, "name"))
+				.latitudeDeg(s(values, "latitude_deg")).longitudeDeg(s(values, "longitude_deg"))
+				.elevationFt(s(values, "elevation_ft")).continent(s(values, "continent"))
+				.isoCountry(s(values, "iso_country")).countryId(countryProvider.apply(s(values, "iso_country")))
+				.isoRegion(s(values, "iso_region")).municipality(s(values, "municipality"))
+				.scheduledService(s(values, "scheduled_service")).gpsCode(s(values, "gps_code"))
+				.iataCode(s(values, "iata_code")).localCode(s(values, "local_code")).homeLink(s(values, "home_link"))
+				.wikipediaLink(s(values, "wikipedia_link")).keywords(s(values, "keywords")).build();
+	}
+
 }
